@@ -18,6 +18,7 @@ public class AwsTest {
     @Test
     @DisplayName("자격 증명 테스트")
     public void credentials_test() {
+
         InstanceProfileCredentialsProvider credentials =
                 InstanceProfileCredentialsProvider.createAsyncRefreshingProvider(true);
 
