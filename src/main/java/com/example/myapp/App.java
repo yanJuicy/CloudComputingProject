@@ -1,10 +1,7 @@
 package com.example.myapp;
 
-import java.io.IOException;
+public class App{
 
-public class App {
 
-    public static void main(String[] args) {
-    }
 
 }

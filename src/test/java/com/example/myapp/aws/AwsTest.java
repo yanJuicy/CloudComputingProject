@@ -5,6 +5,10 @@ import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,9 +39,8 @@ public class AwsTest {
         }
     }
 
-    @Test
-    @DisplayName("초기화 테스트")
-    public void init_test() {
+
+    public void init() {
 
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
         try {
@@ -51,8 +54,43 @@ public class AwsTest {
         }
         ec2 = AmazonEC2ClientBuilder.standard()
                 .withCredentials(credentialsProvider)
-                .withRegion("us-east-2") /* check the region at AWS console */
+                .withRegion("ap-northeast-2") /* check the region at AWS console */
                 .build();
+    }
+
+    @Test
+    @DisplayName("리스트 테스트")
+    public void listInstances_test() {
+        init();
+
+        System.out.println("Listing instances....");
+        boolean done = false;
+        DescribeInstancesRequest request = new DescribeInstancesRequest();
+        System.out.println(request);
+        while(!done) {
+            DescribeInstancesResult response = ec2.describeInstances(request);
+            System.out.println(response);
+            for(Reservation reservation : response.getReservations()) {
+                for(Instance instance : reservation.getInstances()) {
+                    System.out.printf(
+                            "[id] %s, " +
+                                    "[AMI] %s, " +
+                                    "[type] %s, " +
+                                    "[state] %10s, " +
+                                    "[monitoring state] %s",
+                            instance.getInstanceId(),
+                            instance.getImageId(),
+                            instance.getInstanceType(),
+                            instance.getState().getName(),
+                            instance.getMonitoring().getState());
+                }
+                System.out.println();
+            }
+            request.setNextToken(response.getNextToken());
+            if(response.getNextToken() == null) {
+                done = true;
+            }
+        }
     }
 
 }
