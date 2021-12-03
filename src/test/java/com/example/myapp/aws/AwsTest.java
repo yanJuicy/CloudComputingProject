@@ -38,6 +38,7 @@ public class AwsTest {
     @Test
     @DisplayName("초기화 테스트")
     public void init_test() {
+
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
         try {
             credentialsProvider.getCredentials();
