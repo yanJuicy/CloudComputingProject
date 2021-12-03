@@ -92,7 +92,7 @@ public class AwsHandlerTest {
 
     @Test
     @DisplayName("인스턴스 시작 테스트")
-    public void startInstance()
+    public void startInstanceTest()
     {
 //        final AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
         init();

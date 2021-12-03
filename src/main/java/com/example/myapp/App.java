@@ -1,7 +1,9 @@
 package com.example.myapp;
 
+import com.amazonaws.services.ec2.model.Instance;
 import com.example.myapp.aws.AwsHandler;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
@@ -27,11 +29,16 @@ public class App {
     private static void detailMenu(int selectNum) {
         switch (selectNum) {
             case 1:
-                handler.listInstances();
+                List<Instance> instanceList = handler.listInstances();
+                print(instanceList);
                 break;
             case 2:
                 break;
             case 3:
+                System.out.print("Enter instance id: ");
+                String instanceId = sc.next();
+                handler.startInstance(instanceId);
+                print(instanceId);
                 break;
             case 4:
                 break;
@@ -46,6 +53,27 @@ public class App {
             default:
                 System.out.println("Wrong Access");
                 break;
+        }
+    }
+
+    private static void print(String instanceId) {
+        System.out.printf("Successfully started instance %s", instanceId);
+    }
+
+    private static void print(List<Instance> instanceList) {
+        System.out.println("Listing instances....");
+        for(Instance instance : instanceList) {
+            System.out.printf(
+                    "[id] %s, " +
+                            "[AMI] %s, " +
+                            "[type] %s, " +
+                            "[state] %10s, " +
+                            "[monitoring state] %s\n",
+                    instance.getInstanceId(),
+                    instance.getImageId(),
+                    instance.getInstanceType(),
+                    instance.getState().getName(),
+                    instance.getMonitoring().getState());
         }
     }
 

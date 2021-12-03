@@ -4,10 +4,10 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AwsHandler {
 
@@ -43,33 +43,34 @@ public class AwsHandler {
     }
 
     // 인스턴스 리스트
-    public void listInstances() {
-        System.out.println("Listing instances....");
+    public List<Instance> listInstances() {
         boolean done = false;
         DescribeInstancesRequest request = new DescribeInstancesRequest();
+        List<Instance> instanceList = new ArrayList<>();
         while(!done) {
             DescribeInstancesResult response = ec2.describeInstances(request);
             for(Reservation reservation : response.getReservations()) {
                 for(Instance instance : reservation.getInstances()) {
-                    System.out.printf(
-                            "[id] %s, " +
-                                    "[AMI] %s, " +
-                                    "[type] %s, " +
-                                    "[state] %10s, " +
-                                    "[monitoring state] %s",
-                            instance.getInstanceId(),
-                            instance.getImageId(),
-                            instance.getInstanceType(),
-                            instance.getState().getName(),
-                            instance.getMonitoring().getState());
+                    instanceList.add(instance);
                 }
-                System.out.println();
             }
             request.setNextToken(response.getNextToken());
             if(response.getNextToken() == null) {
                 done = true;
             }
         }
+        return instanceList;
+    }
+
+    // 인스턴스 시작
+    public String startInstance(String instance_id)
+    {
+        StartInstancesRequest request = new StartInstancesRequest()
+                .withInstanceIds(instance_id);
+        ec2.startInstances(request);
+        System.out.println("Starting ... " + instance_id);
+
+        return instance_id;
     }
 
 
