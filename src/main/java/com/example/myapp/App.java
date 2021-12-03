@@ -27,6 +27,7 @@ public class App {
     }
 
     private static void detailMenu(int selectNum) {
+        String instanceId = null;
         switch (selectNum) {
             case 1:
                 List<Instance> instanceList = handler.listInstances();
@@ -36,18 +37,20 @@ public class App {
                 break;
             case 3:
                 System.out.print("Enter instance id: ");
-                String instanceId = sc.next();
+                instanceId = sc.next();
                 handler.startInstance(instanceId);
-                print(instanceId);
                 break;
             case 4:
                 break;
             case 5:
+                System.out.print("Enter instance id: ");
+                instanceId = sc.next();
+                handler.stopInstance(instanceId);
                 break;
             case 6:
                 System.out.print("Enter ami id: ");
                 String amiId = sc.next();
-
+                handler.createInstance(amiId);
                 break;
             case 7:
                 break;
@@ -57,10 +60,6 @@ public class App {
                 System.out.println("Wrong Access");
                 break;
         }
-    }
-
-    private static void print(String instanceId) {
-        System.out.printf("Successfully started instance %s", instanceId);
     }
 
     private static void print(List<Instance> instanceList) {

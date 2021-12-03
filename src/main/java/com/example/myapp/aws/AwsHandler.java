@@ -18,6 +18,7 @@ public class AwsHandler {
         init();
     }
 
+    // 싱글톤
     public static AwsHandler getAwsHandler() {
         if (awsHandler == null)
             awsHandler = new AwsHandler();
@@ -47,15 +48,15 @@ public class AwsHandler {
         boolean done = false;
         DescribeInstancesRequest request = new DescribeInstancesRequest();
         List<Instance> instanceList = new ArrayList<>();
-        while(!done) {
+        while (!done) {
             DescribeInstancesResult response = ec2.describeInstances(request);
-            for(Reservation reservation : response.getReservations()) {
-                for(Instance instance : reservation.getInstances()) {
+            for (Reservation reservation : response.getReservations()) {
+                for (Instance instance : reservation.getInstances()) {
                     instanceList.add(instance);
                 }
             }
             request.setNextToken(response.getNextToken());
-            if(response.getNextToken() == null) {
+            if (response.getNextToken() == null) {
                 done = true;
             }
         }
@@ -63,15 +64,45 @@ public class AwsHandler {
     }
 
     // 인스턴스 시작
-    public String startInstance(String instance_id)
-    {
+    public String startInstance(String instance_id) {
         StartInstancesRequest request = new StartInstancesRequest()
                 .withInstanceIds(instance_id);
         ec2.startInstances(request);
         System.out.println("Starting ... " + instance_id);
+        System.out.printf("Successfully started instance %s", instance_id);
 
         return instance_id;
     }
 
+    // 인스턴스 생성
+    public String createInstance(String ami_id) {
+
+        RunInstancesRequest run_request =
+                new RunInstancesRequest()
+                        .withImageId(ami_id)
+                        .withInstanceType(InstanceType.T2Micro)
+                        .withMaxCount(1)
+                        .withMinCount(1);
+
+        RunInstancesResult run_response = ec2.runInstances(run_request);
+        String reservation_id = run_response
+                .getReservation()
+                .getInstances()
+                .get(0)
+                .getInstanceId();
+
+        System.out.printf("Successfully started EC2 instance %s based on AMI %s", reservation_id, ami_id);
+
+        return ami_id;
+    }
+
+    // 인스턴스 중지
+    public String stopInstance(String instance_id) {
+        StopInstancesRequest request = new StopInstancesRequest()
+                .withInstanceIds(instance_id);
+        ec2.stopInstances(request);
+        System.out.printf("Successfully stopped instance %s", instance_id);
+        return instance_id;
+    }
 
 }
