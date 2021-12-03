@@ -5,10 +5,7 @@ import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.*;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,6 +88,21 @@ public class AwsHandlerTest {
                 done = true;
             }
         }
+    }
+
+    @Test
+    @DisplayName("인스턴스 시작 테스트")
+    public void startInstance()
+    {
+//        final AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
+        init();
+
+        String instance_id = "i-016140d66ff7894a0";
+        StartInstancesRequest request = new StartInstancesRequest()
+                .withInstanceIds(instance_id);
+
+        ec2.startInstances(request);
+        System.out.printf("Successfully started instance %s", instance_id);
     }
 
 }
