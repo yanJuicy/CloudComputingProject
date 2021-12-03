@@ -45,6 +45,9 @@ public class App {
             case 5:
                 break;
             case 6:
+                System.out.print("Enter ami id: ");
+                String amiId = sc.next();
+
                 break;
             case 7:
                 break;

@@ -105,4 +105,30 @@ public class AwsHandlerTest {
         System.out.printf("Successfully started instance %s", instance_id);
     }
 
+    @Test
+    @DisplayName("인스턴스 생성 테스트")
+    public void createInstanceTest() {
+        init();
+        try{
+            RunInstancesRequest run_request =
+                    new RunInstancesRequest()
+                            .withImageId("ami-07a94112e645dc0fd")
+                            .withInstanceType(InstanceType.T2Micro)
+                            .withMaxCount(1)
+                            .withMinCount(1);
+
+            RunInstancesResult run_response = ec2.runInstances(run_request);
+            String reservation_id = run_response
+                    .getReservation()
+                    .getInstances()
+                    .get(0)
+                    .getInstanceId();
+
+            System.out.printf("Successfully started EC2 instance %s based on AMI %s", reservation_id, "ami-07a94112e645dc0fd");
+        }catch(Exception e){
+            throw new AmazonClientException("You cannot create this instance. Check the value you entered", e);
+        }
+    }
+
+
 }
