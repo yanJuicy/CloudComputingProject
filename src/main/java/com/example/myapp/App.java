@@ -1,9 +1,7 @@
 package com.example.myapp;
 
-import com.amazonaws.services.ec2.model.Instance;
 import com.example.myapp.aws.AwsHandler;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class App {
@@ -30,10 +28,12 @@ public class App {
         String instanceId = null;
         switch (selectNum) {
             case 1:
-                List<Instance> instanceList = handler.listInstances();
-                print(instanceList);
+                System.out.println("Listing instances....");
+                handler.listInstances();
                 break;
             case 2:
+                System.out.println("Available zones....");
+                handler.listAvailableZones();
                 break;
             case 3:
                 System.out.print("Enter instance id: ");
@@ -41,6 +41,8 @@ public class App {
                 handler.startInstance(instanceId);
                 break;
             case 4:
+                System.out.println("Available regions....");
+                handler.listAvailableRegions();
                 break;
             case 5:
                 System.out.print("Enter instance id: ");
@@ -53,29 +55,17 @@ public class App {
                 handler.createInstance(amiId);
                 break;
             case 7:
+                System.out.print("Enter instance id: ");
+                instanceId = sc.next();
+                handler.rebootInstance(instanceId);
                 break;
             case 8:
+                System.out.println("Listing images....");
+                handler.listImages();
                 break;
             default:
                 System.out.println("Wrong Access");
                 break;
-        }
-    }
-
-    private static void print(List<Instance> instanceList) {
-        System.out.println("Listing instances....");
-        for(Instance instance : instanceList) {
-            System.out.printf(
-                    "[id] %s, " +
-                            "[AMI] %s, " +
-                            "[type] %s, " +
-                            "[state] %10s, " +
-                            "[monitoring state] %s\n",
-                    instance.getInstanceId(),
-                    instance.getImageId(),
-                    instance.getInstanceType(),
-                    instance.getState().getName(),
-                    instance.getMonitoring().getState());
         }
     }
 

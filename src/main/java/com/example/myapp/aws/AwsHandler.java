@@ -37,7 +37,8 @@ public class AwsHandler {
                             "location (~/.aws/credentials), and is in valid format.",
                     e);
         }
-        ec2 = AmazonEC2ClientBuilder.standard()
+        ec2 = AmazonEC2ClientBuilder
+                .standard()
                 .withCredentials(credentialsProvider)
                 .withRegion("ap-northeast-2") /* check the region at AWS console */
                 .build();
@@ -53,6 +54,17 @@ public class AwsHandler {
             for (Reservation reservation : response.getReservations()) {
                 for (Instance instance : reservation.getInstances()) {
                     instanceList.add(instance);
+                    System.out.printf(
+                            "[id] %s, " +
+                                    "[AMI] %s, " +
+                                    "[type] %s, " +
+                                    "[state] %10s, " +
+                                    "[monitoring state] %s\n",
+                            instance.getInstanceId(),
+                            instance.getImageId(),
+                            instance.getInstanceType(),
+                            instance.getState().getName(),
+                            instance.getMonitoring().getState());
                 }
             }
             request.setNextToken(response.getNextToken());
@@ -65,8 +77,7 @@ public class AwsHandler {
 
     // 인스턴스 시작
     public String startInstance(String instance_id) {
-        StartInstancesRequest request = new StartInstancesRequest()
-                .withInstanceIds(instance_id);
+        StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instance_id);
         ec2.startInstances(request);
         System.out.println("Starting ... " + instance_id);
         System.out.printf("Successfully started instance %s", instance_id);
@@ -77,8 +88,7 @@ public class AwsHandler {
     // 인스턴스 생성
     public String createInstance(String ami_id) {
 
-        RunInstancesRequest run_request =
-                new RunInstancesRequest()
+        RunInstancesRequest run_request = new RunInstancesRequest()
                         .withImageId(ami_id)
                         .withInstanceType(InstanceType.T2Micro)
                         .withMaxCount(1)
@@ -105,4 +115,53 @@ public class AwsHandler {
         return instance_id;
     }
 
+    // 인스턴스 리부트
+    public void rebootInstance(String instance_id) {
+        RebootInstancesRequest request = new RebootInstancesRequest()
+                .withInstanceIds(instance_id);
+
+        RebootInstancesResult response = ec2.rebootInstances(request);
+        System.out.println("Rebooting .... " + instance_id);
+        System.out.println("Successfully rebooted instance " + instance_id);
+
+    }
+
+    // 이미지 리스트
+    public List<Image> listImages() {
+        DescribeImagesRequest request = new DescribeImagesRequest().withOwners("self");
+        List<Image> imageList = ec2.describeImages(request).getImages();
+
+        for (Image image : imageList) {
+            System.out.printf("[Image ID] %s, " + "Owner ID] %s, " + "[AMI Status] %s, \n", image.getImageId(), image.getOwnerId(), image.getState());
+        }
+        return imageList;
+    }
+
+    // 사용가능한 존
+    public void listAvailableZones() {
+        DescribeAvailabilityZonesResult zones_response = ec2.describeAvailabilityZones();
+
+        for(AvailabilityZone zone : zones_response.getAvailabilityZones()) {
+            System.out.printf(
+                    "Found availability zone %s " +
+                            "with status %s " +
+                            "in region %s\n",
+                    zone.getZoneName(),
+                    zone.getState(),
+                    zone.getRegionName());
+        }
+    }
+
+    // 사용가능한 지역
+    public void listAvailableRegions() {
+        DescribeRegionsResult regions_response = ec2.describeRegions();
+
+        for(Region region : regions_response.getRegions()) {
+            System.out.printf(
+                    "Found region %s " +
+                            "with endpoint %s\n",
+                    region.getRegionName(),
+                    region.getEndpoint());
+        }
+    }
 }
