@@ -80,7 +80,7 @@ public class AwsHandler {
         StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instance_id);
         ec2.startInstances(request);
         System.out.println("Starting ... " + instance_id);
-        System.out.printf("Successfully started instance %s", instance_id);
+        System.out.println("Successfully started instance " + instance_id);
 
         return instance_id;
     }
@@ -111,7 +111,7 @@ public class AwsHandler {
         StopInstancesRequest request = new StopInstancesRequest()
                 .withInstanceIds(instance_id);
         ec2.stopInstances(request);
-        System.out.printf("Successfully stopped instance %s", instance_id);
+        System.out.println("Successfully stopped instance %s" + instance_id);
         return instance_id;
     }
 
